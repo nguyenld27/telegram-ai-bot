@@ -12,8 +12,6 @@ Tính năng:
 import os
 import logging
 import httpx
-import time
-import traceback
 import json
 from dotenv import load_dotenv
 from telegram import Update, BotCommand
@@ -232,16 +230,8 @@ def main():
     app.add_handler(CommandHandler("viet", viet))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, chat))
 
-    # Auto-restart trên lỗi
-    while True:
-        try:
-            logger.info("🤖 Bot đang chạy...")
-            app.run_polling(allowed_updates=Update.ALL_TYPES)
-        except Exception as e:
-            logger.error(f"❌ Lỗi: {e}")
-            traceback.print_exc()
-            logger.info("⏳ Chờ 10 giây rồi restart...")
-            time.sleep(10)
+    logger.info("🤖 Bot đang chạy...")
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
