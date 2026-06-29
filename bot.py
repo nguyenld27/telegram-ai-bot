@@ -14,7 +14,7 @@ import logging
 import httpx
 import json
 from dotenv import load_dotenv
-from telegram import Update, BotCommand
+from telegram import Update
 from telegram.ext import (
     Application, CommandHandler, MessageHandler,
     filters, ContextTypes
@@ -34,19 +34,6 @@ logging.basicConfig(
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
-
-async def post_init(app: Application) -> None:
-    """Setup bot commands khi khởi động."""
-    commands = [
-        BotCommand("start", "Giới thiệu bot"),
-        BotCommand("help", "Danh sách các lệnh"),
-        BotCommand("tom_tat", "Tóm tắt bài viết từ URL"),
-        BotCommand("viet", "Viết content (caption, email, post...)"),
-        BotCommand("clear", "Xóa lịch sử hội thoại"),
-    ]
-    await app.bot.set_my_commands(commands)
-    logger.info("✅ Bot commands setup xong")
-
 
 # ─── Helper ─────────────────────────────────────────────────────────────────
 def get_history(context: ContextTypes.DEFAULT_TYPE) -> list:
@@ -220,9 +207,6 @@ async def chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     app = Application.builder().token(TELEGRAM_TOKEN).build()
 
-    # Setup commands khi khởi động
-    app.post_init = post_init
-
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_cmd))
     app.add_handler(CommandHandler("clear", clear))
@@ -231,7 +215,7 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, chat))
 
     logger.info("🤖 Bot đang chạy...")
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    app.run_polling()
 
 
 if __name__ == "__main__":
